@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <title>
+        Teste
+        </title>
+        <link rel="stylesheet" type="text/css" href="estilos.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+        <script
+              src="https://code.jquery.com/jquery-3.4.1.js"
+              integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+              crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="videoBox">
+            <button id="videobtnHideShow">
+                <i id="iconeVideoHideShow" class="fas fa-angle-right"></i>
+            </button>
+            
+            <div id="playerVideo">
+                <iframe width="350" height="100%"
+                src="https://www.youtube.com/embed/tgbNymZ7vqY" id="video">
+                </iframe>
+            </div>
+        </div>
+        
+        <script>
+            $(document).ready(function(){
+                
+                $('#videobtnHideShow').click(function(){
+                  var visivel = $('#playerVideo').is(":visible");
+                  if(visivel){
+                    esconder(); 
+                  }else{
+                    mostrar();
+                  }
+                });
+            });
+            
+            
+            
+            function esconder(){
+                var direita = 'fa-angle-right';
+                var esquerda = 'fa-angle-left';
+                
+                $('.videoBox').css({'width': '0px', 'transition-duration': '1s'});
+                    
+                setTimeout(function(){
+                    $('#playerVideo').hide();
+                    $('#iconeVideoHideShow').removeClass(direita).addClass(esquerda);
+                }, 700);
+            }
+            
+            function mostrar(){
+                var direita = 'fa-angle-right';
+                var esquerda = 'fa-angle-left';
+                
+                $('.videoBox').css({'width': '350px', 'transition-duration': '1s'});
+                $('#playerVideo').show();
+                
+                    setTimeout(function(){
+                        $('#iconeVideoHideShow').removeClass(esquerda).addClass(direita);
+                }, 700);
+            }
+        </script>
+    </body>
+</html>
