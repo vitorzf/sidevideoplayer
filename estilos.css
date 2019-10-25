@@ -54,6 +54,7 @@
     background-color: #242323;
 }
 
+
 #volume {
     -webkit-appearance: none;
     display: block;
@@ -63,12 +64,12 @@
     background-color: #242323;
 }
 
+
 #volume::-webkit-slider-thumb{
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background-color:red;
-    -webkit-border-radius: 50%;
+    width: 10px;
+    height: 24px;
+    background-color:white;
 }
  
 #seek::-webkit-slider-thumb {
