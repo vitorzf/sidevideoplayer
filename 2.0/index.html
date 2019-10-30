@@ -1,0 +1,173 @@
+<html>
+    <head>
+        <title>
+        Example Side Video Player
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" type="text/css" href="estilos.css">
+        <link rel="stylesheet" type="text/css" href="player.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script
+              src="https://code.jquery.com/jquery-3.4.1.js"
+              integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+              crossorigin="anonymous"></script>
+        <script type="text/javascript" src="html5slider.js"></script>
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    </head>
+    <body>
+        <audio id="youtube-video" controls hidden></audio>
+        <div class="player">
+            <div class="comandos">
+                <button class="botao" id="play">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="botao" id="volMenos">
+                    <i class="fas fa-volume-down"></i>
+                </button>
+                <button  class="botao" id="volMais">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <input type="range" id="tempo" value="0" max=""/>
+                <div class="tempoAudio">
+                    <span id="tempoAtual">00:00:00</span> /
+                    <span id="tempoTotal">00:00:00</span>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            
+            $(document).ready(function(){
+                
+                setTimeout(function(){ 
+                    $('#players').show();
+                    var container = $('.container');
+                    var cover = $('.cover');
+                    var close = $('#close');
+                    var song = document.getElementById("youtube-video");
+                    var duration = song.duration;
+
+                     $(document).on('click', '#play', function(e) {
+                        e.preventDefault();
+                        if(isNaN(song.duration)){
+                            alert("Desculpe, não foi possível carregar o audio");
+                            return;
+                        }
+                        song.play();
+                        $('#tempoTotal').text(converteTempo(song.duration));
+                        $('#play').replaceWith('<button class="botao" id="pause"><i class="fas fa-pause"></i></button>');
+                        
+                        $('#tempo').attr('max',song.duration);
+                    });
+
+                    $(document).on('click', '#pause', function(e) {
+                        e.preventDefault();
+                        song.pause();
+                        $('#pause').replaceWith('<button class="botao" id="play"><i class="fas fa-play"></i></button>');
+
+                    });
+                    
+                    $(document).on('click','#volMenos' , function(e) {
+                        var volume = song.volume;
+                        if(volume > 0){
+                            var v = volume - 0.1;
+                            song.volume = v.toFixed(1);
+                        }
+                    });
+                    
+                    $(document).on('click','#volMais' , function(e) {
+                        var volume = song.volume;
+                        if(volume < 1){
+                            var v = volume + 0.1;
+                            song.volume = v.toFixed(1);
+                        }
+                    });
+
+                    $("#tempo").bind("change", function() {
+                        song.currentTime = $(this).val();
+                        $("#tempo").attr("max", song.duration);
+                    });
+
+                    song.addEventListener('timeupdate',function (){
+                        
+                    var tmpo = document.getElementById('tempo');
+                    curtime = parseInt(song.currentTime, 10);
+                    if(song.currentTime == song.duration){
+                        $('#pause').replaceWith('<button class="botao" id="play"><i class="fas fa-play"></i></button>');
+                        document.getElementById("tempo").value = "0";
+                        $('#tempoAtual').text('00:00:00');
+                        $('#tempoTotal').text('00:00:00');
+                        return;
+                    }
+                    $('#tempoAtual').text(converteTempo(song.currentTime))
+                    
+                    tmpo.value = song.currentTime;
+                    });
+                }, 2000);
+            });
+            
+        var vid = "doYmL8w3qF8",
+            audio_streams = {},
+            audio_tag = document.getElementById('youtube-video');
+
+        fetch("https://"+vid+"-focus-opensocial.googleusercontent.com/gadgets/proxy?container=none&url=https%3A%2F%2Fwww.youtube.com%2Fget_video_info%3Fvideo_id%3D" + vid).then(response => {
+            if (response.ok) {
+                response.text().then(data => {
+
+                    var data = parse_str(data),
+                        streams = (data.url_encoded_fmt_stream_map + ',' + data.adaptive_fmts).split(',');
+                    
+                    streams.forEach(function(s, n) {
+                        var stream = parse_str(s),
+                            itag = stream.itag * 1,
+                            quality = false;
+                        switch (itag) {
+                            case 139:
+                                quality = "48kbps";
+                                break;
+                            case 140:
+                                quality = "128kbps";
+                                break;
+                            case 141:
+                                quality = "256kbps";
+                                break;
+                        }
+                        if (quality) audio_streams[quality] = stream.url;
+                    });
+
+                    audio_tag.src = audio_streams['128kbps'];
+//                    audio_tag.play();
+                })
+            }
+        });
+
+        function converteTempo(sec){
+            var sec_num = parseInt(sec, 10); // don't forget the second param
+            var hours   = Math.floor(sec_num / 3600);
+            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+            var seconds = sec_num - (hours * 3600) - (minutes * 60);
+            var text = '';
+            if (hours   < 10) {hours   = "0"+hours;}
+            if (minutes < 10) {minutes = "0"+minutes;}
+            if (seconds < 10) {seconds = "0"+seconds;}
+            if(hours >= 1){
+                text+= hours+":";
+            }
+            text += minutes+':'+seconds
+            return text;
+        }
+            
+        function parse_str(str) {
+            return str.split('&').reduce(function(params, param) {
+                var paramSplit = param.split('=').map(function(value) {
+                    return decodeURIComponent(value.replace('+', ' '));
+                });
+                params[paramSplit[0]] = paramSplit[1];
+                return params;
+            }, {});
+        }
+        
+        </script>
+    </body>
+</html>
